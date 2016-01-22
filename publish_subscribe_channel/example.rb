@@ -8,10 +8,10 @@ require "json"
 require_relative "../shared/aws_config"
 
 sqs = Aws::SQS::Client.new
-queue = sqs.create_queue(queue_name: "publish_subscribe_channel")
+queue = sqs.create_queue(queue_name: "publish_subscribe_channel_0")
 queue_attributes = sqs.get_queue_attributes(
   queue_url: queue.queue_url,
-  attribute_names: ["QueueArn", "Policy"]
+  attribute_names: ["QueueArn"]
 )
 
 sns = Aws::SNS::Client.new
@@ -26,13 +26,12 @@ sqs.set_queue_attributes(
   queue_url: queue.queue_url,
   attributes: {
     "Policy" => {
-      "Version" => Time.now.strftime("%Y-%m-%d"),
+      "Version" => "2012-10-17",
       "Statement" => [
         {
-          "Sid" => "PublishSubscribePolicy",
           "Effect" => "Allow",
           "Principal" => "*",
-          "Action" => "sqs => SendMessage",
+          "Action" => "sqs:SendMessage",
           "Resource" => queue_attributes.attributes["QueueArn"],
           "Condition" => {
             "ArnEquals" => {
