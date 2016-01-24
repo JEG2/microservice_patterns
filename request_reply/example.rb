@@ -12,7 +12,7 @@ reply_queue = sqs.create_queue(queue_name: "reply_queue")
 pid =
   fork do
     puts "Child process #{Process.pid} waiting for messages...\n"
-    poller = Aws::SQS::QueuePoller.new(request_queue[:queue_url])
+    poller = Aws::SQS::QueuePoller.new(request_queue.queue_url)
     loop do
       begin
         poller.poll do |msg|
@@ -34,8 +34,7 @@ end
   sqs.send_message(queue_url: request_queue.queue_url, message_body: "Message #{i}")
 end
 
-poller = Aws::SQS::QueuePoller.new(reply_queue[:queue_url])
+poller = Aws::SQS::QueuePoller.new(reply_queue.queue_url)
 poller.poll(idle_timeout: 3) do |msg|
   puts "processing response of '#{msg.body}' in #{Process.pid}.\n"
 end
-

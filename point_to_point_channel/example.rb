@@ -11,9 +11,15 @@ queue = sqs.create_queue(queue_name: "point_to_point_channel")
 pids = Array.new(3) {
   fork do
     puts "Child process #{Process.pid} waiting for messages...\n"
-    poller = Aws::SQS::QueuePoller.new(queue[:queue_url])
-    poller.poll do |msg|
-      puts "Processing '#{msg.body}' in #{Process.pid}.\n"
+    poller = Aws::SQS::QueuePoller.new(queue.queue_url)
+    loop do
+      begin
+        poller.poll do |msg|
+          puts "Processing '#{msg.body}' in #{Process.pid}.\n"
+        end
+      rescue
+        sleep 0.2
+      end
     end
   end
 }
