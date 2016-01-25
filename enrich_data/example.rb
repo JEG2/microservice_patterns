@@ -56,16 +56,13 @@ pids = Array.new(queue_urls.size) { |i|
     puts "Child process #{Process.pid} waiting for messages...\n"
     poller = Aws::SQS::QueuePoller.new(queue_urls[i])
     poller.poll do |msg|
-      #puts "Processing '#{msg.body}' in #{Process.pid}.\n"
       journey = JSON.parse(JSON.parse(msg.body)["Message"])
-      puts "journey:"
-      p journey
-      p journey.class
-      #journey = JSON.parse(journey)
       if PATHS[i].include?(journey["from"]) 
         if PATHS[i][journey["from"]].include?(journey["to"])
-          puts "final path :#{journey["from"]} to #{journey["to"]}"
-          puts "#{journey["path"]}"
+          included_steps = journey["path"].find_all { |r| r.include?("to #{journey["from"]}")}
+          puts "found route"
+          puts "first step: #{included_steps.join(",")}"
+          puts "final step: #{journey["from"]} to #{journey["to"]}"
         else
           "publishing other routes"
           PATHS[i][journey["from"]].each do |midpoint|
