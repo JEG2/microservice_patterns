@@ -62,17 +62,17 @@ pids = Array.new(queue_urls.size) { |i|
       p journey
       p journey.class
       #journey = JSON.parse(journey)
-      if PATHS[i].include?(journey[:from]) 
-        if PATHS[i][journey[:from]].include?(journey[:to])
-          puts "final path :#{journey[:from]} to #{journey[:to]}"
-          puts "#{journey[:path]}"
+      if PATHS[i].include?(journey["from"]) 
+        if PATHS[i][journey["from"]].include?(journey["to"])
+          puts "final path :#{journey["from"]} to #{journey["to"]}"
+          puts "#{journey["path"]}"
         else
           "publishing other routes"
-          PATHS[i][journey[:from]].each do |midpoint|
+          PATHS[i][journey["from"]].each do |midpoint|
             new_journey = {
               from: midpoint,
-              path: journey[:path] << "#{journey[:from]} to #{midpoint}",
-              to:   journey[:to]
+              path: journey["path"] << "#{journey["from"]} to #{midpoint}",
+              to:   journey["to"]
             }.to_json
             sns.publish(topic_arn: topic.topic_arn, message: new_journey)
           end
